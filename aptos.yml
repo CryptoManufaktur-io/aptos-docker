@@ -1,0 +1,39 @@
+x-logging: &logging
+  logging:
+    driver: json-file
+    options:
+      max-size: 100m
+      max-file: "3"
+      tag: '{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}'
+
+services:
+  aptos:
+    image: ${DOCKER_REPO}:${DOCKER_TAG}
+    pull_policy: always
+    command: aptos-node -f /opt/aptos/etc/fullnode.yaml
+    working_dir: /opt/aptos/etc
+    volumes:
+      - ./aptos/${NETWORK}:/opt/aptos/etc
+      - aptos-data:/opt/aptos/data
+    ports:
+      - ${P2P_PORT:-6182}:6182 # p2p
+    <<: *logging
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${RPC_HOST}.service=${RPC_HOST}
+      - traefik.http.routers.${RPC_HOST}.entrypoints=websecure
+      - traefik.http.routers.${RPC_HOST}.rule=Host(`${RPC_HOST}.${DOMAIN}`)
+      - traefik.http.routers.${RPC_HOST}.tls.certresolver=letsencrypt
+      - traefik.http.routers.${RPC_HOST}lb.service=${RPC_HOST}
+      - traefik.http.routers.${RPC_HOST}lb.entrypoints=websecure
+      - traefik.http.routers.${RPC_HOST}lb.rule=Host(`${RPC_LB}.${DOMAIN}`)
+      - traefik.http.routers.${RPC_HOST}lb.tls.certresolver=letsencrypt
+      - traefik.http.services.${RPC_HOST}.loadbalancer.server.port=8080
+
+      - metrics.scrape=true
+      - metrics.path=/metrics
+      - metrics.port=9101
+      - metrics.network=aptos-${NETWORK}
+
+volumes:
+  aptos-data:

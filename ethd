@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-__project_name="X Docker"
-__app_name="X node"
-__sample_service="X-geth"
+__project_name="Aptos Docker"
+__app_name="aptos node"
+__sample_service="aptos"
 __docker_exe="docker"
 __compose_exe="docker compose"
 __compose_upgraded=0
@@ -20,8 +20,8 @@ version() {
 # Client versions
 # Adjust for your clients and how to check their version
   case "${__value}" in
-    *x.yml* )
-      __docompose exec x-geth x-geth version
+    *aptos.yml* )
+      __docompose exec aptos aptos-node --info
       ;;&
   esac
 }
