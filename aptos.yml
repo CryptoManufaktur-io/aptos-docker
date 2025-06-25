@@ -12,6 +12,7 @@ services:
     pull_policy: always
     command: aptos-node -f /opt/aptos/etc/fullnode.yaml
     working_dir: /opt/aptos/etc
+    restart: unless-stopped
     volumes:
       - ./aptos/${NETWORK}:/opt/aptos/etc
       - aptos-data:/opt/aptos/data
