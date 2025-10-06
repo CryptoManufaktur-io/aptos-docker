@@ -16,7 +16,13 @@ api:
   enabled: true
   address: "0.0.0.0:8080"
 
+indexer_db_config:
+  enable_event: true     
+  enable_statekeys: true
+
 storage:
   storage_pruner_config:
     ledger_pruner_config:
       enable: false
+  rocksdb_configs:
+    enable_storage_sharding: true
