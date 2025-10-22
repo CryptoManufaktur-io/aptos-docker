@@ -1,0 +1,30 @@
+services:
+  validator:
+      image: "${VALIDATOR_IMAGE_REPO:-aptoslabs/validator}:${IMAGE_TAG:-testnet}"
+      volumes:
+        - type: volume
+          source: aptos-validator
+          target: /opt/aptos/data
+        - type: bind
+          source: ./aptos/testnet/validator.yaml
+          target: /opt/aptos/etc/validator.yaml
+        - type: bind
+          source: ./aptos/testnet/genesis.blob
+          target: /opt/aptos/genesis/genesis.blob
+        - type: bind
+          source: ./aptos/testnet/waypoint.txt
+          target: /opt/aptos/genesis/waypoint.txt
+        - type: bind
+          source: ./keys/validator-identity.yaml
+          target: /opt/aptos/genesis/validator-identity.yaml
+      command: ["/usr/local/bin/aptos-node", "-f", "/opt/aptos/etc/validator.yaml"]
+      restart: unless-stopped
+      ports:
+        - "8080:8080"
+        - "6180:6180"
+        - "6182:6182"
+        - "9101:9101"
+
+volumes:
+  aptos-validator:
+    name: aptos-validator
