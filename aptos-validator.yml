@@ -1,18 +1,18 @@
 services:
   validator:
-    image: "${VALIDATOR_IMAGE_REPO:-aptoslabs/validator}:${IMAGE_TAG:-mainnet}"
+    image: "${VALIDATOR_IMAGE_REPO:-aptoslabs/validator}:${NETWORK:-mainnet}"
     volumes:
       - type: volume
         source: aptos-validator
         target: /opt/aptos/data
       - type: bind
-        source: ./aptos/mainnet/validator.yaml
+        source: ./aptos/${NETWORK:-mainnet}/validator.yaml
         target: /opt/aptos/etc/validator.yaml
       - type: bind
-        source: ./aptos/mainnet/genesis.blob
+        source: ./aptos/${NETWORK:-mainnet}/genesis.blob
         target: /opt/aptos/genesis/genesis.blob
       - type: bind
-        source: ./aptos/mainnet/waypoint.txt
+        source: ./aptos/${NETWORK:-mainnet}/waypoint.txt
         target: /opt/aptos/genesis/waypoint.txt
       - type: bind
         source: ./keys/validator-identity.yaml
@@ -23,27 +23,24 @@ services:
     ports:
       - "8080:8080"
       - "6180:6180"
-      - "6182:6182"
       - "9101:9101"
   db-restore:
     profiles: ["tools"]
-    image: "aptoslabs/tools:${IMAGE_TAG:-mainnet}"
+    image: "aptoslabs/tools:${NETWORK:-mainnet}"
     volumes:
       - type: volume
         source: aptos-validator
         target: /opt/aptos/data
       - type: bind
-        source: ./aptos/mainnet/s3-public.yaml
-        target: /opt/aptos/etc/s3-public.yaml
+        source: ./aptos/${NETWORK:-mainnet}/backup.yaml
+        target: /opt/aptos/etc/backup.yaml
     command:
       [
         "aptos",
         "node",
         "bootstrap-db",
-        "--target-version",
-        "3608663422",
         "--command-adapter-config",
-        "/opt/aptos/etc/s3-public.yaml",
+        "/opt/aptos/etc/backup.yaml",
         "--target-db-dir",
         "/opt/aptos/data/db",
       ]
