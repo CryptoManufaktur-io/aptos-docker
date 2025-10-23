@@ -1,29 +1,53 @@
 services:
   validator:
-      image: "${VALIDATOR_IMAGE_REPO:-aptoslabs/validator}:${IMAGE_TAG:-testnet}"
-      volumes:
-        - type: volume
-          source: aptos-validator
-          target: /opt/aptos/data
-        - type: bind
-          source: ./aptos/testnet/validator.yaml
-          target: /opt/aptos/etc/validator.yaml
-        - type: bind
-          source: ./aptos/testnet/genesis.blob
-          target: /opt/aptos/genesis/genesis.blob
-        - type: bind
-          source: ./aptos/testnet/waypoint.txt
-          target: /opt/aptos/genesis/waypoint.txt
-        - type: bind
-          source: ./keys/validator-identity.yaml
-          target: /opt/aptos/genesis/validator-identity.yaml
-      command: ["/usr/local/bin/aptos-node", "-f", "/opt/aptos/etc/validator.yaml"]
-      restart: unless-stopped
-      ports:
-        - "8080:8080"
-        - "6180:6180"
-        - "6182:6182"
-        - "9101:9101"
+    image: "${VALIDATOR_IMAGE_REPO:-aptoslabs/validator}:${IMAGE_TAG:-mainnet}"
+    volumes:
+      - type: volume
+        source: aptos-validator
+        target: /opt/aptos/data
+      - type: bind
+        source: ./aptos/mainnet/validator.yaml
+        target: /opt/aptos/etc/validator.yaml
+      - type: bind
+        source: ./aptos/mainnet/genesis.blob
+        target: /opt/aptos/genesis/genesis.blob
+      - type: bind
+        source: ./aptos/mainnet/waypoint.txt
+        target: /opt/aptos/genesis/waypoint.txt
+      - type: bind
+        source: ./keys/validator-identity.yaml
+        target: /opt/aptos/genesis/validator-identity.yaml
+    command:
+      ["/usr/local/bin/aptos-node", "-f", "/opt/aptos/etc/validator.yaml"]
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "6180:6180"
+      - "6182:6182"
+      - "9101:9101"
+  db-restore:
+    profiles: ["tools"]
+    image: "aptoslabs/tools:${IMAGE_TAG:-mainnet}"
+    volumes:
+      - type: volume
+        source: aptos-validator
+        target: /opt/aptos/data
+      - type: bind
+        source: ./aptos/mainnet/s3-public.yaml
+        target: /opt/aptos/etc/s3-public.yaml
+    command:
+      [
+        "aptos",
+        "node",
+        "bootstrap-db",
+        "--target-version",
+        "3608663422",
+        "--command-adapter-config",
+        "/opt/aptos/etc/s3-public.yaml",
+        "--target-db-dir",
+        "/opt/aptos/data/db",
+      ]
+    restart: "no"
 
 volumes:
   aptos-validator:
