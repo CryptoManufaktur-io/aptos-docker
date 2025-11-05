@@ -28,6 +28,11 @@ full_node_networks:
     type: "from_file"
     path: "/opt/aptos/genesis/validator-full-node-identity.yaml"
 
+state_sync:
+  state_sync_driver:
+    bootstrapping_mode: DownloadLatestStates
+    continuous_syncing_mode: ExecuteTransactionsOrApplyOutputs
+
 api:
   enabled: true
   address: "0.0.0.0:8080"
