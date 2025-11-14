@@ -4,3 +4,6 @@
 *.original
 custom.yml
 default-files/
+
+keys/*
+!.keys/.gitkeep
