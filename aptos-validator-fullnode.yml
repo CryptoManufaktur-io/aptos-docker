@@ -60,6 +60,11 @@ services:
       - 8080
       # Validator metrics
       - 9101
+    labels:
+      - metrics.scrape=true
+      - metrics.path=/metrics
+      - metrics.port=9101
+      - metrics.network=aptos-${NETWORK}
 
 networks:
   shared:

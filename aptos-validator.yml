@@ -69,6 +69,11 @@ services:
       - 9101
       # Disable access to rest API port 80 for validator by default
       # - 8080
+    labels:
+      - metrics.scrape=true
+      - metrics.path=/metrics
+      - metrics.port=9101
+      - metrics.network=aptos-${NETWORK}
 
 networks:
   shared:
