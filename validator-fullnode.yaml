@@ -30,7 +30,7 @@ services:
       - "127.0.0.1:9102:9102"
 
   fullnode:
-    image: "${VALIDATOR_IMAGE_REPO:-aptoslabs/validator}:${IMAGE_TAG:-testnet}"
+    image: "${DOCKER_REPO:-aptoslabs/validator}:${DOCKER_TAG:-testnet}"
     networks:
       shared:
     volumes:
