@@ -20,3 +20,4 @@ repos:
   - id: git-dirty
   - id: git-check
   - id: forbid-binary
+    exclude: ^aptos/(testnet|mainnet)/genesis\.blob$
