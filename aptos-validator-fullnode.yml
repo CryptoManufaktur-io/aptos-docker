@@ -1,5 +1,3 @@
-# This compose file defines an Aptos Fullnode deployment.
-# Read the README.md files for instruction on how to install aptos-node
 
 services:
   haproxy:
