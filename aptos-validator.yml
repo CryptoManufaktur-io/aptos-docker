@@ -37,6 +37,10 @@ services:
 
   validator:
     image: "${DOCKER_REPO:-aptoslabs/validator}:${DOCKER_TAG:-testnet}"
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
     networks:
       shared:
     volumes:

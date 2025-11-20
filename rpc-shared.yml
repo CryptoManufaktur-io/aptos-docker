@@ -2,4 +2,3 @@ services:
   aptos:
     ports:
       - ${API_PORT:-8080}:8080 # api
-

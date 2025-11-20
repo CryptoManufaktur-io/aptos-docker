@@ -12,7 +12,7 @@ services:
     ulimits:
       nofile:
         soft: 1048576
-        hard: 1048576    
+        hard: 1048576
     pull_policy: always
     command: aptos-node -f /opt/aptos/etc/fullnode.yaml
     working_dir: /opt/aptos/etc
