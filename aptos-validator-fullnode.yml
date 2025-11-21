@@ -1,40 +1,11 @@
 
 services:
-  haproxy:
-    image: haproxy:3.0.2
-    volumes:
-      - type: bind
-        source: ./aptos/${NETWORK:-mainnet}/haproxy-fullnode.cfg
-        target: /usr/local/etc/haproxy/haproxy.cfg
-      - type: bind
-        source: ./aptos/${NETWORK:-mainnet}/blocked.ips
-        target: /usr/local/etc/haproxy/blocked.ips
-    networks:
-      - shared
-    expose:
-      # Public fullnode access
-      - 6182
-      # REST API
-      - 8080
-      # Fullnode metrics
-      - 9101
-      # Haproxy stats page
-      - 9102
-    ports:
-      - "6182:6182"
-      - "8080:8080"
-      # Only expose these internally
-      - "127.0.0.1:9101:9101"
-      - "127.0.0.1:9102:9102"
-
   fullnode:
     image: "${DOCKER_REPO:-aptoslabs/validator}:${DOCKER_TAG:-testnet}"
     ulimits:
       nofile:
         soft: 1048576
         hard: 1048576
-    networks:
-      shared:
     volumes:
       - type: volume
         source: aptos-fullnode
@@ -53,25 +24,15 @@ services:
         target: /opt/aptos/genesis/validator-full-node-identity.yaml
     command: ["/usr/local/bin/aptos-node", "-f", "/opt/aptos/etc/fullnode.yaml"]
     restart: unless-stopped
-    expose:
-      # Public fullnode access
-      - 6182
-      # REST API
-      - 8080
-      # Validator metrics
-      - 9101
+    ports:
+      - "6181:6181"
+      - "6182:6182"
+      - "9101:9101"
     labels:
       - metrics.scrape=true
       - metrics.path=/metrics
       - metrics.port=9101
       - metrics.network=aptos-${NETWORK}
-
-networks:
-  shared:
-    name: "aptos-docker-compose-shared"
-    ipam:
-      config:
-        - subnet: 172.16.1.0/24
 
 volumes:
   aptos-fullnode:
