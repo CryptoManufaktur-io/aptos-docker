@@ -1,6 +1,5 @@
 
 services:
-
   validator:
     image: "${DOCKER_REPO:-aptoslabs/validator}:${DOCKER_TAG:-testnet}"
     ulimits:
@@ -25,18 +24,7 @@ services:
         target: /opt/aptos/genesis/validator-identity.yaml
     command: ["/usr/local/bin/aptos-node", "-f", "/opt/aptos/etc/validator.yaml"]
     restart: unless-stopped
-    # expose:
-    #   # These are only exposed on the docker internal network
-    #   # Validator network
-    #   - 6180
-    #   # Fullnode access to validators
-    #   - 6181
-    #   # Validator Metrics
-    #   - 9101
-    #   # Disable access to rest API port 80 for validator by default
-    #   # - 8080
     ports:
-      # Expose these to the outside
       - "6180:6180"
       - "6181:6181"
       - "9101:9101"
