@@ -1,6 +1,6 @@
 
 services:
-  validator:
+  aptos:
     image: "${DOCKER_REPO:-aptoslabs/validator}:${DOCKER_TAG:-testnet}"
     ulimits:
       nofile:
@@ -35,5 +35,4 @@ services:
       - metrics.network=aptos-${NETWORK}
 
 volumes:
-  aptos-validator:
-    name: aptos-validator
+  aptos-data:
