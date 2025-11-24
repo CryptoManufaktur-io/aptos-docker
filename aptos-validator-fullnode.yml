@@ -1,0 +1,38 @@
+
+services:
+  aptos:
+    image: "${DOCKER_REPO:-aptoslabs/validator}:${DOCKER_TAG:-testnet}"
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    volumes:
+      - type: volume
+        source: aptos-fullnode
+        target: /opt/aptos/data
+      - type: bind
+        source: ./aptos/${NETWORK:-mainnet}/validator-fullnode.yaml
+        target: /opt/aptos/etc/fullnode.yaml
+      - type: bind
+        source: ./aptos/${NETWORK:-mainnet}/genesis.blob
+        target: /opt/aptos/genesis/genesis.blob
+      - type: bind
+        source: ./aptos/${NETWORK:-mainnet}/waypoint.txt
+        target: /opt/aptos/genesis/waypoint.txt
+      - type: bind
+        source: ./keys/validator-full-node-identity.yaml
+        target: /opt/aptos/genesis/validator-full-node-identity.yaml
+    command: ["/usr/local/bin/aptos-node", "-f", "/opt/aptos/etc/fullnode.yaml"]
+    restart: unless-stopped
+    ports:
+      - "6181:6181"
+      - "6182:6182"
+      - "9101:9101"
+    labels:
+      - metrics.scrape=true
+      - metrics.path=/metrics
+      - metrics.port=9101
+      - metrics.network=aptos-${NETWORK}
+
+volumes:
+  aptos-data:
