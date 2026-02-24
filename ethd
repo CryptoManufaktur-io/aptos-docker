@@ -900,6 +900,14 @@ logs() {
   __docompose logs "$@"
 }
 
+check_sync() {
+  if [[ "$#" -eq 0 ]]; then
+    ./scripts/check_sync.sh --compose-service aptos --public-rpc https://api.mainnet.aptoslabs.com/v1
+  else
+    ./scripts/check_sync.sh "$@"
+  fi
+}
+
 
 cmd() {
   __docompose "$@"
@@ -1003,6 +1011,8 @@ __full_help() {
   echo "    prints the version(s) of currently running client(s)"
   echo "  logs"
   echo "    shows logs"
+  echo "  check-sync"
+  echo "    compare local node status to a public RPC to verify sync"
   echo "  cmd <command>"
   echo "    executes an arbitrary Docker Compose command. Use \"cmd help\" to list them"
   echo "  terminate"
@@ -1040,7 +1050,7 @@ __me="./$(basename "${BASH_SOURCE[0]}")"
 
 trap '__handle_error $? $LINENO' ERR EXIT
 
-if [[ "$#" -eq 0 || "$*" = "--help" || "$*" = "-h" || "$*" = "update --help" || "$*" = "update -h" ]]; then
+if [[ "$#" -eq 0 || ( "$1" =~ ^-h|--help$ && "${2:-}" != "check-sync" ) || "$*" = "update --help" || "$*" = "update -h" ]]; then
   help "$@"
   exit 0
 fi
@@ -1064,6 +1074,11 @@ __determine_distro
 __prep_conffiles
 
 __check_for_snap
+
+if [ "$__command" = "check-sync" ]; then
+  check_sync "$@"
+  exit "$?"
+fi
 
 if [ "$__command" = "install" ]; then
   $__command "$@"
@@ -1107,6 +1122,8 @@ fi
 case "$__command" in
   help|update|up|start|down|stop|restart|version|logs|cmd|terminate|space)
     $__command "$@";;
+  check-sync)
+    check_sync "$@";;
   *)
     echo "Unrecognized command $__command"
     help
