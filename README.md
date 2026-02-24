@@ -28,6 +28,23 @@ To update the software, run `./aptosd update` and then `./aptosd up`
 `custom.yml` is not tracked by git and can be used to override anything in the provided yml files. If you use it,
 add it to `COMPOSE_FILE` in `.env`
 
+## Sync Check
+
+Run:
+
+`./aptosd check-sync`
+
+Default `check-sync` settings:
+
+- compose service: `aptos`
+- local RPC: `http://127.0.0.1:${API_PORT:-8080}/v1`
+- public RPC: `https://api.mainnet.aptoslabs.com/v1`
+- lag threshold: `2` blocks
+
+You can override defaults with:
+
+`./scripts/check_sync.sh --compose-service aptos --local-rpc <url> --public-rpc <url> --block-lag <n> --env-file <path>`
+
 ## Version
 
 aptos docker Docker uses a semver scheme.
