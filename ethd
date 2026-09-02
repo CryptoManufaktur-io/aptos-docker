@@ -28,30 +28,8 @@ version() {
 
 
 __prep_conffiles() {
-  # Generate the bind-mounted fullnode.yaml from its sample, filling in the ledger pruner
-  # settings from .env. Aptos defaults the ledger pruner to enabled with a 90M window, so
-  # "off" has to be written out explicitly - omitting the keys turns pruning on
-  local __network
-  local __pruner_enabled
-  local __prune_window
-
-  if [ ! -f "${__env_file}" ]; then
-    return
-  fi
-
-  __get_value_from_env "NETWORK" "${__env_file}" "__network"
-  if [ -z "${__network}" ] || [ ! -f "aptos/${__network}/fullnode.yaml.sample" ]; then
-    return
-  fi
-
-  __get_value_from_env "LEDGER_PRUNER_ENABLED" "${__env_file}" "__pruner_enabled"
-  __get_value_from_env "LEDGER_PRUNE_WINDOW" "${__env_file}" "__prune_window"
-
-  ${__as_owner} cp "aptos/${__network}/fullnode.yaml.sample" "aptos/${__network}/fullnode.yaml"
-  ${__as_owner} sed -i \
-    -e "s/@LEDGER_PRUNER_ENABLED@/${__pruner_enabled:-false}/" \
-    -e "s/@LEDGER_PRUNE_WINDOW@/${__prune_window:-360000000}/" \
-    "aptos/${__network}/fullnode.yaml"
+  # Adjust - this is where sample files would be copied to config files that are meant to be bind-mounted
+  return
 }
 
 
