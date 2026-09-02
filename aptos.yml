@@ -15,8 +15,12 @@ services:
         hard: 1048576
     pull_policy: always
     # The entrypoint renders /opt/aptos/run/fullnode.yaml from the sample on every start.
-    # /tini stays in front of it so signals still reach aptos-node
-    entrypoint: ["/tini", "--", "/scripts/docker-entrypoint.sh"]
+    # /tini is the image's own entrypoint and stays in front of it, so signals still reach
+    # aptos-node
+    entrypoint:
+      - /tini
+      - --
+      - docker-entrypoint.sh
     command: aptos-node -f /opt/aptos/run/fullnode.yaml
     working_dir: /opt/aptos/etc
     restart: unless-stopped
@@ -28,7 +32,7 @@ services:
       - LEDGER_PRUNE_WINDOW=${LEDGER_PRUNE_WINDOW:-360000000}
     volumes:
       - ./aptos/${NETWORK}:/opt/aptos/etc
-      - ./scripts:/scripts:ro
+      - ./aptos/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh
       - aptos-data:/opt/aptos/data
     ports:
       - ${P2P_PORT:-6182}:6182 # p2p

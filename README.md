@@ -31,7 +31,7 @@ add it to `COMPOSE_FILE` in `.env`
 ## Ledger pruning
 
 The node config is rendered from `aptos/${NETWORK}/fullnode.yaml.sample` by
-`scripts/docker-entrypoint.sh` on every container start, and written to `/opt/aptos/run/fullnode.yaml` inside
+`aptos/docker-entrypoint.sh` on every container start, and written to `/opt/aptos/run/fullnode.yaml` inside
 the container. There is no `fullnode.yaml` on the host to edit - change the sample, or set these in `.env`:
 
 - `LEDGER_PRUNER_ENABLED` - default `false`
