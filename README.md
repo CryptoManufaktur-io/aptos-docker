@@ -28,6 +28,31 @@ To update the software, run `./aptosd update` and then `./aptosd up`
 `custom.yml` is not tracked by git and can be used to override anything in the provided yml files. If you use it,
 add it to `COMPOSE_FILE` in `.env`
 
+## Ledger pruning
+
+`aptos/${NETWORK}/fullnode.yaml` is generated from `fullnode.yaml.sample` on every `./aptosd` run and is not
+tracked by git. Do not edit it directly, your changes will be overwritten - edit the sample, or set these in
+`.env`:
+
+- `LEDGER_PRUNER_ENABLED` - default `false`
+- `LEDGER_PRUNE_WINDOW` - default `360000000`, only takes effect when the pruner is enabled
+
+Aptos enables the ledger pruner by default with a 90M window, so `LEDGER_PRUNER_ENABLED=false` is written into
+the config explicitly. Omitting the keys entirely turns pruning *on*, not off.
+
+`LEDGER_PRUNE_WINDOW` is a transaction count, not a duration, so how much history it buys depends on chain
+throughput. At roughly 20M transactions/day on mainnet, 360M is about 18 days. Aptos warns below 50M and
+subtracts a 200k `user_pruning_window_offset`, so the effective window is slightly smaller than configured.
+
+Widening the window does not recover already-pruned history - the pruner simply idles until the node has
+accumulated enough new history to reach the new window, and disk grows until then.
+
+After changing either setting, restart the node and confirm the pruner is active: `oldest_ledger_version` from
+the `/v1` endpoint should advance as old data is pruned.
+
+Never cold-start a fresh Chainlink relayer against a pruned node - the LogPoller starts at offset 0 (genesis),
+which is already pruned.
+
 ## Sync Check
 
 Run:

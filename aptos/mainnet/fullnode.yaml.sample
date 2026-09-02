@@ -23,6 +23,7 @@ indexer_db_config:
 storage:
   storage_pruner_config:
     ledger_pruner_config:
-      enable: false
+      enable: @LEDGER_PRUNER_ENABLED@
+      prune_window: @LEDGER_PRUNE_WINDOW@
   rocksdb_configs:
     enable_storage_sharding: true
