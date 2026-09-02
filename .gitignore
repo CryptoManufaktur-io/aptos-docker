@@ -3,4 +3,5 @@
 *.bak
 *.original
 custom.yml
+aptos/*/fullnode.yaml
 .agent/*
