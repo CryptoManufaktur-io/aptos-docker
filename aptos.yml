@@ -14,11 +14,21 @@ services:
         soft: 1048576
         hard: 1048576
     pull_policy: always
-    command: aptos-node -f /opt/aptos/etc/fullnode.yaml
+    # The entrypoint renders /opt/aptos/run/fullnode.yaml from the sample on every start.
+    # /tini stays in front of it so signals still reach aptos-node
+    entrypoint: ["/tini", "--", "/scripts/docker-entrypoint.sh"]
+    command: aptos-node -f /opt/aptos/run/fullnode.yaml
     working_dir: /opt/aptos/etc
     restart: unless-stopped
+    # AptosDB is a multi-hundred-GB RocksDB. The 10s Compose default SIGKILLs it mid-flush,
+    # leaving recovery to the WAL on next start
+    stop_grace_period: 5m
+    environment:
+      - LEDGER_PRUNER_ENABLED=${LEDGER_PRUNER_ENABLED:-false}
+      - LEDGER_PRUNE_WINDOW=${LEDGER_PRUNE_WINDOW:-360000000}
     volumes:
       - ./aptos/${NETWORK}:/opt/aptos/etc
+      - ./scripts:/scripts:ro
       - aptos-data:/opt/aptos/data
     ports:
       - ${P2P_PORT:-6182}:6182 # p2p

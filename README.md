@@ -30,9 +30,9 @@ add it to `COMPOSE_FILE` in `.env`
 
 ## Ledger pruning
 
-`aptos/${NETWORK}/fullnode.yaml` is generated from `fullnode.yaml.sample` on every `./aptosd` run and is not
-tracked by git. Do not edit it directly, your changes will be overwritten - edit the sample, or set these in
-`.env`:
+The node config is rendered from `aptos/${NETWORK}/fullnode.yaml.sample` by
+`scripts/docker-entrypoint.sh` on every container start, and written to `/opt/aptos/run/fullnode.yaml` inside
+the container. There is no `fullnode.yaml` on the host to edit - change the sample, or set these in `.env`:
 
 - `LEDGER_PRUNER_ENABLED` - default `false`
 - `LEDGER_PRUNE_WINDOW` - default `360000000`, only takes effect when the pruner is enabled
@@ -47,8 +47,10 @@ subtracts a 200k `user_pruning_window_offset`, so the effective window is slight
 Widening the window does not recover already-pruned history - the pruner simply idles until the node has
 accumulated enough new history to reach the new window, and disk grows until then.
 
-After changing either setting, restart the node and confirm the pruner is active: `oldest_ledger_version` from
-the `/v1` endpoint should advance as old data is pruned.
+After changing either setting, restart the node. The entrypoint logs the values it applied, so
+`./aptosd logs | grep docker-entrypoint` confirms what the node actually started with, and
+`./aptosd cmd exec aptos cat /opt/aptos/run/fullnode.yaml` shows the rendered config. `oldest_ledger_version`
+from the `/v1` endpoint should advance as old data is pruned.
 
 Never cold-start a fresh Chainlink relayer against a pruned node - the LogPoller starts at offset 0 (genesis),
 which is already pruned.
