@@ -49,11 +49,18 @@ accumulated enough new history to reach the new window, and disk grows until the
 
 After changing either setting, restart the node. The entrypoint logs the values it applied, so
 `./aptosd logs | grep docker-entrypoint` confirms what the node actually started with, and
-`./aptosd cmd exec aptos cat /opt/aptos/run/fullnode.yaml` shows the rendered config. `oldest_ledger_version`
-from the `/v1` endpoint should advance as old data is pruned.
+`./aptosd cmd exec aptos cat /opt/aptos/run/fullnode.yaml` shows the rendered config.
+
+Once the retention window is full, `oldest_ledger_version` from the `/v1` endpoint advances as old data is
+pruned. Note it does *not* advance while the window is still filling - a node that previously ran a smaller
+window will hold `oldest_ledger_version` steady until it has accumulated enough history to reach the new one,
+which is the pruner working correctly rather than a fault.
 
 Never cold-start a fresh Chainlink relayer against a pruned node - the LogPoller starts at offset 0 (genesis),
 which is already pruned.
+
+An earlier version of this repo rendered the config to `aptos/${NETWORK}/fullnode.yaml` on the host. That file
+is no longer read and can be deleted; it stays gitignored so a leftover copy does not show up as untracked.
 
 ## Sync Check
 
